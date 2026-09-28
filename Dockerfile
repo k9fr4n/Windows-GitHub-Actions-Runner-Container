@@ -1,13 +1,13 @@
 # escape=`
 FROM mcr.microsoft.com/windows/servercore:ltsc2025
 
-SHELL ["powershell", "-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG RUNNER_VERSION=2.328.0
 ARG GIT_VERSION=2.50.1
 
 ENV RUNNER_HOME=C:\actions-runner
-ENV PATH="C:\Program Files\Git\cmd;C:\Program Files\Git\bin;${PATH}"
+ENV PATH="C:\Program Files\Git\cmd;C:\Program Files\Git\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH"
 
 WORKDIR C:\actions-runner
 
@@ -23,4 +23,4 @@ RUN $runnerArchive = Join-Path $env:TEMP 'actions-runner.zip'; `
 
 COPY entrypoint.ps1 C:\entrypoint.ps1
 
-ENTRYPOINT ["powershell", "-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\entrypoint.ps1"]
+ENTRYPOINT ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\entrypoint.ps1"]
