@@ -14,5 +14,32 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Start Docker Engine
+        timeout-minutes: 3
+        run: |
+          $service = Get-Service -Name docker -ErrorAction Stop
+          if ($service.Status -ne 'Running') {
+            Start-Service -Name docker
+          }
+
+          $dockerReady = $false
+          $lastDockerOutput = @()
+          for ($attempt = 0; $attempt -lt 24; $attempt++) {
+            $lastDockerOutput = @(docker info 2>&1)
+            $dockerExitCode = $LASTEXITCODE
+            if ($dockerExitCode -eq 0) {
+              $dockerReady = $true
+              break
+            }
+            if ($attempt -lt 23) {
+              Start-Sleep -Seconds 5
+            }
+          }
+
+          if (-not $dockerReady) {
+            $lastDockerDiagnostic = $lastDockerOutput -join [Environment]::NewLine
+            throw "Docker Engine did not become ready after 24 attempts. Last docker info output: $lastDockerDiagnostic"
+          }
+
       - name: Build image
         run: docker build --tag windows-github-runner:test .
